@@ -35,7 +35,22 @@ candidate rules are scored by rank correlation against the observed positions:
 | `sent_at` | wall-clock time at the sender, a proxy for arrival ordering |
 | `nonce` | a deterministic id order, i.e. *no* rule at all, which is the null hypothesis |
 
-## The four things this design has to get right
+## How each named confound is addressed
+
+The bounty lists six things a valid design must account for. Each is handled
+explicitly, and the table below also says where a choice is deliberate rather than
+complete:
+
+| consideration | treatment |
+|---|---|
+| **Leader schedule and leader types** | Targets come from the epoch schedule by client family; the producing validator is then read back from the block (`rewards[].pubkey`), and disagreement with the schedule is recorded instead of silently reassigning credit. A `rewards` recipient that is not a validator identity (a revenue collector) is resolved through its vote account's `nodePubkey`. |
+| **Path from backend to the executing node** | Fixed, not varied: one RPC provider plus a backup, the same connections and blockhash for every probe in a batch. It is a single hop by design, so a position cannot be explained by one probe taking a different route. A different transport (direct TPU/QUIC, Jito bundles) can change arrival and is out of scope for the bounty and for this harness. |
+| **Interaction of our own transactions** | Probes are self-transfers of distinct amounts, so the only shared resource is the leader's queue. Nonces and fees are independently shuffled, so the batch cannot manufacture a fee correlation. Probes that land in another block are attributed there, not to the slot we aimed at. |
+| **Competition inside the block** | Each block's fill is recorded (200–670 transactions here) and every probe's absolute position is kept, so a contention-dependent rule can be looked for. What this cannot rule out is a fee rule that appears only in saturated blocks: our batches were never the majority of a block. |
+| **Send order** | Pre-signed, then all primaries fired at once, so `send_seq` is departure order rather than construction order. `sent_at` is stamped as each send leaves and correlates 1.00 with `send_seq`, which shows the two agree instead of one being an artefact of the thread pool. |
+| **Noise versus rule** | Four rules are scored per block, including the null (`nonce`) and the competitor (`fee_desc`). A rule is only claimed if it wins every block *and* keeps its sign; the fee rule swings −1.00 … +0.80 across blocks of the same client, which is what noise looks like at this sample size. |
+
+## The four implementation details that decide whether the numbers are real
 
 **1. The leader is read from the block, not from the schedule.** A slot can be
 skipped, in which case the next validator in the schedule produces it. We
@@ -58,16 +73,16 @@ saturated block can be excluded rather than used to explain an odd result.
 repeats, while nonces are shuffled independently, so `fee_desc` and `nonce` test
 different hypotheses on the same batch.
 
-## Every confound the question names, and what this does about it
+**5. The batch must arrive inside one slot.** Every probe is signed before the
+first is sent, and all primaries leave at once; the backup-RPC fan-out runs on a
+separate pool so waiting on it cannot delay the next primary. Sequential sends
+spread a batch over 4–6 blocks and leave too few probes per block to test anything.
 
-| consideration | how it is handled |
-|---|---|
-| **Leader schedule and leader types** | Targets are picked from the epoch schedule by client family; the producing validator is then read back from the block, not assumed. `leader_matches_schedule` records disagreement so a skipped slot is visible instead of silently reassigning credit. |
-| **Path from backend to the executing node** | The path is identical for every probe in a batch: same provider, same connections, same blockhash. It is deliberately a single hop (one RPC plus a backup); a different path can change arrival and therefore position without the scheduler changing, which is why it is fixed and stated rather than varied. |
-| **Interaction of our own transactions** | Probes are self-transfers of distinct amounts, so the only shared resource is the leader's queue. Fee and nonce are shuffled independently of send order, so a batch cannot manufacture a fee correlation. Any probe that lands in a different block is attributed there, not to the intended slot. |
-| **Competition inside the block** | Every block's fill is recorded (`block_tx_count`, 200–670 here) and every probe's absolute position is kept, so a rule that only bites under contention can be looked for. What this cannot see is a rule that appears only in saturated blocks: our batches were never the majority of a block. |
-| **Send order** | Pre-signed, then all primaries fired at once, so `send_seq` is the order of departure, not the order of construction. `sent_at` is stamped as each send leaves and correlates 1.00 with `send_seq`, which confirms the two are consistent rather than an artefact of the thread pool. |
-| **Noise versus rule** | Four rules are scored per block by rank correlation; the null (`nonce`) and the competitor (`fee_desc`) both get a turn. A rule is claimed only if it wins every block *and* holds its sign; the fee rule swings −1.00 … +0.80 across blocks of the same client, which is what noise looks like at this sample size. |
+**6. A probe's block is the one that contains it.** A signature's landing slot is
+authoritative only if the block fetched for that slot actually holds it, so the
+harvest pins every probe to a block whose signature list contains its signature.
+`scripts/verify_blocks.py` re-checks exactly that, which is how the one file with
+misattributed probes was caught after the fact.
 
 ## Safety
 
