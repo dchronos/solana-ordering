@@ -8,7 +8,9 @@ post-upgrade behaviour. Network: Solana mainnet-beta throughout.
 
 **Ordering is arrival order. The priority fee is not the sort key.**
 
-Across 40 distinguishable blocks, 22 validator identities and 6 client builds
+Across 40 distinguishable blocks, 14 validator identities (22 distinct
+block-revenue leaders: an identity can route its block revenue to a separate
+collector, which is why the per-validator table has 22 rows) and 6 client builds
 (Agave 4.3.2, 4.4.0, 4.4.0-rc.1; Firedancer 0.1.1, 26.10.4, 26.10.5), the rank
 correlation between our transactions' send order and their position in the block
 is **1.00 in every single block**. The same correlation against the fee actually
@@ -32,7 +34,11 @@ four candidate rules by Spearman rank correlation against the observed positions
 
 ## Per-validator results
 
-| validator | version | blocks | probes | arrival | fee range | measured (UTC) |
+Rows are keyed by the block's fee recipient (`rewards[].pubkey`), which is what
+the chain lets us attribute a block to. Where a vote account routes revenue to a
+separate collector, one identity owns two rows; 22 rows cover 14 identities.
+
+| fee recipient | version | blocks | probes | arrival | fee range | measured (UTC) |
 |---|---|---|---|---|---|---|
 | `Fd7btg…69Nk` | 4.4.0 | 5 | 32 | **1.00** | -1.00 … +0.80 | 2026-10-30 23:51 – 01:38 |
 | `FBbqKv…Se89` | 0.1.1 | 4 | 24 | **1.00** | -0.40 … +0.20 | 2026-10-30 23:51 – 01:25 |
@@ -124,7 +130,7 @@ Stated plainly, because a null result about fee is only as good as its confounds
   backup. A different path (TPU QUIC directly to the leader, Jito bundles) can
   change arrival, and therefore position, without any scheduler rule changing.
   Jito tips and bundles are explicitly out of scope for the bounty and for us.
-- **No stake-weighted survey.** 17 identities is not 17 representative
+- **No stake-weighted survey.** 14 identities is not 14 representative
   identities; large-stake leaders appear more often in the sample simply because
   they get more slots.
 - **Client version is read from the cluster snapshot at analysis time**, which is

@@ -177,7 +177,7 @@ python scripts/verify_blocks.py data/run_v3.json   # -> "verification: consisten
 python scripts/summarise.py                        # the tables below, from raw data
 ```
 
-**40 blocks, 293 probes, 22 validators, 6 client builds: ordering is arrival, not price.**
+**40 blocks, 293 probes, 14 validator identities (22 revenue leaders), 6 client builds: ordering is arrival, not price.**
 
 Pooled over the six runs in `data/`, the arrival rule scores **1.00 in every
 block** and the fee rule has no consistent sign:
