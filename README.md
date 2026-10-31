@@ -98,6 +98,12 @@ plan of 6 families x 2 slots x 8 probes estimates 0.000931 SOL and the default c
 is 0.0015 SOL, both printed by the dry run before anything is signed. The bounty's
 0.05 SOL limit is ~50x what these runs cost.
 
+## Report
+
+`REPORT.md` is the write-up required by the bounty: per-validator results with
+measurement dates, the seven things that went wrong and how each was caught, and
+an explicit list of what this design does **not** separate.
+
 ## Layout
 
 ```
@@ -159,36 +165,6 @@ later, because it was sent 2 ms later. Position tracks send time; fee does not.
 This is why paying priority fees on Solana does not reliably move you ahead of
 same-slot competition: within a leader's block, the ordering is the order the
 transactions arrived, and the fee is not the sort key.
-
-## What the measurements taught about the method
-
-Five failures happened during development and changed the design. They are
-recorded here because each one would have produced a plausible, wrong answer:
-
-1. **A payer below the rent-exempt minimum sends nothing at all.** With 655 175
-   lamports the runtime rejected every transaction with
-   `InsufficientFundsForRent`; with `skipPreflight` the sends still returned
-   signatures, the harvest still found no blocks, and the run looked like a
-   measurement of "no ordering". The 890 880-lamport floor is now checked before
-   anything is signed, and the run refuses to start without it.
-2. **A probe can land in the previous validator's block.** In the wide run that
-   sent 8 slots early, 5 of 12 probes were included by the validator before the
-   target one. Attribution is therefore per block (`leader_per_rewards`), never per
-   intended slot; the off-target blocks stay in the data and are excluded from the
-   per-client statistics with an explicit verdict.
-3. **Too little lead lands nothing.** With a 1-slot lead, every batch arrived after
-   the block was sealed and nothing landed. Zero data looks like "no rule" unless
-   the cause is written down.
-4. **Sequential sending splits the batch.** Sending 6 transactions one after
-   another took about a second and spread them across six different slots, leaving
-   too few probes per block to test any rule. The batch is now pre-signed, and all
-   primaries are sent at once while the backup fan-out runs on its own pool: 3
-   workers still split a 10-probe batch across 4-6 blocks.
-5. **The fee recipient is not always the validator.** One block credited
-   `J1to5o1Q…`, which is not in the leader schedule: the vote account routes block
-   revenue to a separate collector at 100% commission. Read as a validator
-   identity it produces an "unknown client" row and silently drops a real
-   measurement. It is now resolved through the vote account's `nodePubkey`.
 
 ## Limits
 
