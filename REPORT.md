@@ -97,7 +97,14 @@ judge to be misled by data that looks fine.
    micro-lamports/CU at a 1 200 CU limit changes the fee by 3 lamports per step:
    a 5 000 to 5 033 spread. The null result for fee on that data meant nothing.
    The ladder now spans 5 000 to 17 600 lamports (3.5x) in the wide run.
-7. **A single public RPC aborted a run after the fees were already paid.** The
+7. **The verifier did not check the thing it claimed to check.** It compared the
+   block's leader against the recorded one and printed positions, but never
+   asserted that the probes the analysis counted are actually *in* that block. In
+   `run_smoke2.json` (kept for the record, excluded from all numbers here) 12 of 24
+   counted probes were attributed to a block that does not contain them, and the
+   verifier still printed "consistent". It now compares claimed signatures against
+   the fetched block and fails; that file reports 2 discrepancies.
+8. **A single public RPC aborted a run after the fees were already paid.** The
    harvest now retries reads across endpoints; the write path stays on the
    configured RPC.
 

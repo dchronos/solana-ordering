@@ -136,7 +136,7 @@ login, so there was no free way to fund an end-to-end run there.
 ## Report
 
 `REPORT.md` is the write-up required by the bounty: per-validator results with
-measurement dates, the seven things that went wrong and how each was caught, and
+measurement dates, the eight things that went wrong and how each was caught, and
 an explicit list of what this design does **not** separate.
 
 ## Layout

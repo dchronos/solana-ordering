@@ -77,6 +77,20 @@ def main() -> int:
                 print(f"  pos {idx:4d}  nonce {nonce:3d}  fee {fee} lamports  cu {cu}")
             if len(hits) < 3:
                 print(f"  note: only {len(hits)} of our transactions in this block")
+            # A probe the run says is in this block but that the chain does not
+            # contain is a wrong attribution, not a small sample. Checking only the
+            # leader misses it: a block can be the right leader and still not hold
+            # the probes the analysis counted.
+            claimed = {
+                p["signature"]: p
+                for p in m["probes"]
+                if p.get("tx_index") is not None and str(p.get("slot")) == slot_key and p.get("signature")
+            }
+            found = {sig for sig in claimed if sig in {t.get("transaction", {}).get("signatures", [None])[0] for t in txs}}
+            missing = set(claimed) - found
+            if missing:
+                print(f"  !! {len(missing)} of {len(claimed)} claimed probes are not in this block")
+                problems += 1
 
     print("\nverification:", "consistent" if problems == 0 else f"{problems} discrepancy(ies)")
     return 0 if problems == 0 else 1
