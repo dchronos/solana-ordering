@@ -1,0 +1,42 @@
+# One command reproduces the whole measurement:
+#
+#   SOLANA_SECRET_KEY=<base58 secret> docker compose up            # live, capped
+#   docker compose up                                              # dry-run plan
+#
+# Keys are injected at run time into a tmpfs file, used, and deleted. They never
+# reach an image layer, a build arg, or the repository.
+services:
+  probe:
+    build: .
+    environment:
+      SOLANA_RPC: ${SOLANA_RPC:-https://api.mainnet-beta.solana.com}
+      SOLANA_KEYPAIR_PATH: /tmp/key/payer.json
+      SOLANA_SECRET_KEY: ${SOLANA_SECRET_KEY:-}
+    volumes:
+      - ./data:/app/data
+    tmpfs:
+      - /tmp/key:mode=0700,size=1m
+    # The cap guards the wallet even if the configuration is wrong: the tool
+    # refuses to sign past MAX_LAMPORTS.
+    command:
+      - "sh"
+      - "-c"
+      - |
+        set -e
+        MODE="${MODE:-dry-run}"
+        if [ -n "$${SOLANA_SECRET_KEY}" ]; then
+          sh /app/scripts/make_key.sh /tmp/key/payer.json
+          FLAG=--live
+        else
+          FLAG=--dry-run
+          MODE=dry-run
+        fi
+        python /app/src/scheduler_probe.py \
+          "$$FLAG" \
+          --keypair /tmp/key/payer.json \
+          --per-family "${PER_FAMILY:-1}" \
+          --per-slot "${PER_SLOT:-8}" \
+          --max-lamports "${MAX_LAMPORTS:-700000}" \
+          --reserve-lamports "${RESERVE_LAMPORTS:-50000}" \
+          --out "data/run_$${MODE}.json"
+        rm -f /tmp/key/payer.json

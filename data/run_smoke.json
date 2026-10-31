@@ -1,0 +1,702 @@
+{
+  "mode": "live",
+  "rpc": "https://api.mainnet-beta.solana.com",
+  "epoch": {
+    "absoluteSlot": 463474569,
+    "blockHeight": 441496830,
+    "epoch": 1072,
+    "slotIndex": 370569,
+    "slotsInEpoch": 432000,
+    "transactionCount": 564533606814
+  },
+  "families": {
+    "agave-4.4.0": [
+      "CcaHc2L43ZWjwCHART3oZoJvHLAe9hzT2DJNUpBzoTN1"
+    ],
+    "agave-4.4.0-rc.1": [
+      "3N7s9zXMZ4QqvHQR15t5GNHyqc89KduzMP7423eWiD5g"
+    ],
+    "agave-4.3.2": [
+      "8GbwASqdpw4dVcwbWUxbHXMrjyQx2aKkoBR5H1GJF8iD"
+    ],
+    "firedancer-26.10.5": [
+      "CatzoSMUkTRidT5DwBxAC2pEtnwMBTpkCepHkFgZDiqb"
+    ],
+    "firedancer-26.10.4": [
+      "8Pep3GmYiijRALqrMKpez92cxvF4YPTzoZg83uXh14pW"
+    ],
+    "firedancer-0.1.1": [
+      "H43AYFsvhNuALQieHpLXefp1ECgEBT6oVnS4EcTsC25C"
+    ]
+  },
+  "windows": [
+    {
+      "slot": 463474604,
+      "vote": "CcaHc2L43ZWjwCHART3oZoJvHLAe9hzT2DJNUpBzoTN1",
+      "identity": "Fd7btgySsrjuo25CJCj7oE7VPMyezDhnx7pZkj2v69Nk",
+      "version": "4.4.0",
+      "client_family": "agave-4.4.0"
+    },
+    {
+      "slot": 463474656,
+      "vote": "8GbwASqdpw4dVcwbWUxbHXMrjyQx2aKkoBR5H1GJF8iD",
+      "identity": "E1r4Psq84tHfQ6aPTvvDka4U3u8zPVD7gEUrH25RdxHL",
+      "version": "4.3.2",
+      "client_family": "agave-4.3.2"
+    },
+    {
+      "slot": 463474728,
+      "vote": "CatzoSMUkTRidT5DwBxAC2pEtnwMBTpkCepHkFgZDiqb",
+      "identity": "JUPiTERrZqgf1jUyR7dSkhMx4Kn2qJyekWsg3LT1h4b",
+      "version": "26.10.5",
+      "client_family": "firedancer-26.10.5"
+    },
+    {
+      "slot": 463474856,
+      "vote": "8Pep3GmYiijRALqrMKpez92cxvF4YPTzoZg83uXh14pW",
+      "identity": "87CcUxpyR72ZyfaZirj86mqkbk5uuU2EfnwTegVMLJL5",
+      "version": "26.10.4",
+      "client_family": "firedancer-26.10.4"
+    },
+    {
+      "slot": 463474920,
+      "vote": "3N7s9zXMZ4QqvHQR15t5GNHyqc89KduzMP7423eWiD5g",
+      "identity": "DRpbCBMxVnDK7maPM5tGv6MvB3v1sRMC86PZ8okm21hy",
+      "version": "4.4.0-rc.1",
+      "client_family": "agave-4.4.0-rc.1"
+    },
+    {
+      "slot": 463475100,
+      "vote": "H43AYFsvhNuALQieHpLXefp1ECgEBT6oVnS4EcTsC25C",
+      "identity": "FBbqKvwLfKGZrKrfSbPJz4ymQ7zMarhRyZtu1RBkSe89",
+      "version": "0.1.1",
+      "client_family": "firedancer-0.1.1"
+    }
+  ],
+  "estimated_transactions": 36,
+  "estimated_lamports": 180864,
+  "cap_lamports": 400000,
+  "payer": "8w2qakgsS9fHN4NTJ8t7RM1oxyG7zf4Dd6tcVpJwkCzb",
+  "start_balance_lamports": 990427,
+  "measurements": [
+    {
+      "validator": {
+        "vote": "CcaHc2L43ZWjwCHART3oZoJvHLAe9hzT2DJNUpBzoTN1",
+        "identity": "Fd7btgySsrjuo25CJCj7oE7VPMyezDhnx7pZkj2v69Nk",
+        "version": "4.4.0",
+        "client_family": "agave-4.4.0",
+        "feature_set": 3722100051,
+        "stake_sol": 16965455.70408787,
+        "commission": 7
+      },
+      "slot": 463474604,
+      "slot_leader_per_schedule": "Fd7btgySsrjuo25CJCj7oE7VPMyezDhnx7pZkj2v69Nk",
+      "block_leader_per_rewards": null,
+      "leader_matches_schedule": null,
+      "block": null,
+      "probes": [
+        {
+          "slot": 463474604,
+          "nonce": 2,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 0,
+          "sent_at": 1793403877.5535917,
+          "signature": "3G1LNK2uCuGtviSbba94Rd25h2QFa62HYcj33HiquK9VbnxGHUHqahbPRDwrFGgVtxSk56wXyBpt4JLuTFfpzYCV",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474604,
+          "nonce": 4,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 1,
+          "sent_at": 1793403877.760352,
+          "signature": "2hYiRAJZknrWqQoX3BREXkaVNUaReoFGvHRYc5Mi7dCR5aiENSc5WUTAZV6fv98dXnNnnYMaJ6HTXjRoU3pVHUGu",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474604,
+          "nonce": 0,
+          "micro_lamports": 5000,
+          "cu_limit": 1200,
+          "send_seq": 2,
+          "sent_at": 1793403877.9803104,
+          "signature": "gk5e79xkQuyGmqhv1mRrzYSnen1GBqKtqV3oraG9vZanfy4ZKmDwQ2SxhFuNEPS7YdGCtUbRTQTSQDW7Wkxq4CF",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474604,
+          "nonce": 1,
+          "micro_lamports": 20000,
+          "cu_limit": 1200,
+          "send_seq": 3,
+          "sent_at": 1793403878.1809454,
+          "signature": "2BsddnNZYHYsyzGGdBtSMDSo1KV4X2fUdUgH2dii4qurCKi3ZVUsK3TTeptiJKQYsgiciKTmuo3pzt3dJkVLV6Xs",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474604,
+          "nonce": 5,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 4,
+          "sent_at": 1793403878.3818552,
+          "signature": "3nzRTYo2PZHVp12bsP85WDwoxveptNG4qq6cV2b8VVuunTVMho787TnFrx2Gx2yq97QqFcsJVGJyhkZM8HQrqRYj",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474604,
+          "nonce": 3,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 5,
+          "sent_at": 1793403878.582964,
+          "signature": "5K4hQMBtniGgCQ52o8zk6DhyR1x13a9q8yfoA6MNG7Tc1RJTngwNWdabRM6KQrmmMrjybCxXX3jvXcuVUoRqAMyZ",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        }
+      ]
+    },
+    {
+      "validator": {
+        "vote": "8GbwASqdpw4dVcwbWUxbHXMrjyQx2aKkoBR5H1GJF8iD",
+        "identity": "E1r4Psq84tHfQ6aPTvvDka4U3u8zPVD7gEUrH25RdxHL",
+        "version": "4.3.2",
+        "client_family": "agave-4.3.2",
+        "feature_set": 3383571666,
+        "stake_sol": 10502229.126157764,
+        "commission": 0
+      },
+      "slot": 463474656,
+      "slot_leader_per_schedule": "E1r4Psq84tHfQ6aPTvvDka4U3u8zPVD7gEUrH25RdxHL",
+      "block_leader_per_rewards": null,
+      "leader_matches_schedule": null,
+      "block": null,
+      "probes": [
+        {
+          "slot": 463474656,
+          "nonce": 4,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 6,
+          "sent_at": 1793403889.3325417,
+          "signature": "64TcQqsG8bsqtsCRptSWiAffjfRdQHbUwnwXkoruTAf6XFnGA2JLdcsRCmnUUMqaiQdahtUkdxta8aYnnEqKhuaS",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474656,
+          "nonce": 3,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 7,
+          "sent_at": 1793403889.548789,
+          "signature": "2GeS7GeBX9ACGzvwBasqa79eCnf4VZF8zgMJMHjZ5KZpPX4fntsofz8cgAWh4zfBhJnTgXekp8GTyizeQmVsVCqc",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474656,
+          "nonce": 1,
+          "micro_lamports": 5000,
+          "cu_limit": 1200,
+          "send_seq": 8,
+          "sent_at": 1793403889.7533853,
+          "signature": "uVvqqHse3pAasRnTwvhLHJiDaeYZPTHvLBKwdGj8ww8cd39nLZE7pA4qQeZdaArZ4MbaBpBrcYJ1LGR9mH3v4UR",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474656,
+          "nonce": 5,
+          "micro_lamports": 20000,
+          "cu_limit": 1200,
+          "send_seq": 9,
+          "sent_at": 1793403889.959297,
+          "signature": "2jF4QaGXfBdEYwd4XpKkjzSZPVB2WmuXe3gr4Bc7jPNZ64KEWGdm42DGL3TiM94D1dCAmsAXfJa7MzavRpN2uQ8i",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474656,
+          "nonce": 0,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 10,
+          "sent_at": 1793403890.1612308,
+          "signature": "BVnBK7hfvFnyqZRRLTFz1WLfoNCgZyQMXwrnifxC3Cta8mnUQcgJDHijC8m1EWg3gBsMx54nzZcnmJ15GGH84Bg",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474656,
+          "nonce": 2,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 11,
+          "sent_at": 1793403890.3678262,
+          "signature": "NbYDMzGxcsFLuJuvJ1nsyvGhNN8bZWjdjgA5i8oW8TUfAmpknw1UtRyeaHa2KTJnpp8FALAfmDaRsWfi9dg6L1e",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        }
+      ]
+    },
+    {
+      "validator": {
+        "vote": "CatzoSMUkTRidT5DwBxAC2pEtnwMBTpkCepHkFgZDiqb",
+        "identity": "JUPiTERrZqgf1jUyR7dSkhMx4Kn2qJyekWsg3LT1h4b",
+        "version": "26.10.5",
+        "client_family": "firedancer-26.10.5",
+        "feature_set": 1766517360,
+        "stake_sol": 9659910.322871957,
+        "commission": 5
+      },
+      "slot": 463474728,
+      "slot_leader_per_schedule": "JUPiTERrZqgf1jUyR7dSkhMx4Kn2qJyekWsg3LT1h4b",
+      "block_leader_per_rewards": null,
+      "leader_matches_schedule": null,
+      "block": null,
+      "probes": [
+        {
+          "slot": 463474728,
+          "nonce": 0,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 12,
+          "sent_at": 1793403903.1366262,
+          "signature": "5PnRKr48q2CZKvoeDajrSF2s8WjCPwSL4rdBsgw5FfnYJpcofSqimbckX7wegFfWPNYticZwPJQtdLJfDCiJyzSq",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474728,
+          "nonce": 2,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 13,
+          "sent_at": 1793403903.3839798,
+          "signature": "5sAUoiwh27CQhtxnqENQ6c2DZz44g2WVsmqqZhGDfEyrTxvtFQFSGjzUgTovruydCMrPPkdR6nkLEpdAm5q5t9ap",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474728,
+          "nonce": 4,
+          "micro_lamports": 5000,
+          "cu_limit": 1200,
+          "send_seq": 14,
+          "sent_at": 1793403903.5836365,
+          "signature": "AP41vYsxrPuYrcWhsKuHm35pQ9MJXnybEsPvef1m8fv7rGctUBnk2RzpzHWp5rNmAM2srsbUtMqmHwRKgqSjfyZ",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474728,
+          "nonce": 3,
+          "micro_lamports": 20000,
+          "cu_limit": 1200,
+          "send_seq": 15,
+          "sent_at": 1793403903.8217292,
+          "signature": "5y1it4XYQfVFDzgw9eZU98XNMPnhM5CwUxPeTUSCGiC12zQsFvMg12hSusTbqAZreZFGic1bAt1w9wu63X2wUQma",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474728,
+          "nonce": 1,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 16,
+          "sent_at": 1793403904.0289214,
+          "signature": "f7d4xTVqvfEXLCZEmMaVAf1TzWvXd24PeEwtCvjktS6Yntb875NuVQKzwCtkzSSudzg34VDS6fn32PpqVER3Pgd",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474728,
+          "nonce": 5,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 17,
+          "sent_at": 1793403904.2553384,
+          "signature": "2G5h4qVuDTTbanGmcYZN7fwsSwdCvSmsMicR1xYLGDCic2hHxMEiwLVMtW2DfLwZkbkMo9KB14tFussXbPmwHhxP",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        }
+      ]
+    },
+    {
+      "validator": {
+        "vote": "8Pep3GmYiijRALqrMKpez92cxvF4YPTzoZg83uXh14pW",
+        "identity": "87CcUxpyR72ZyfaZirj86mqkbk5uuU2EfnwTegVMLJL5",
+        "version": "26.10.4",
+        "client_family": "firedancer-26.10.4",
+        "feature_set": 1766517360,
+        "stake_sol": 3823598.46291634,
+        "commission": 0
+      },
+      "slot": 463474856,
+      "slot_leader_per_schedule": "87CcUxpyR72ZyfaZirj86mqkbk5uuU2EfnwTegVMLJL5",
+      "block_leader_per_rewards": null,
+      "leader_matches_schedule": null,
+      "block": null,
+      "probes": [
+        {
+          "slot": 463474856,
+          "nonce": 5,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 18,
+          "sent_at": 1793403930.2749412,
+          "signature": "5PdsgN4zHuS3ywGjnv9LoyHyxye2J4b4bDHXnAu2Y86rUdtY4giUa3qun6N3FegnmAUfE88biD4eAozYSFKoWxf8",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474856,
+          "nonce": 4,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 19,
+          "sent_at": 1793403930.4768372,
+          "signature": "3FdjuitxZRTspdnS392QXvuZpn7hAAYKaZ2fPJ7L5R8nBht9xipXKLvDc4bVz2xRfrX2sW3xp26Ch9G1rK2VvHAV",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474856,
+          "nonce": 0,
+          "micro_lamports": 5000,
+          "cu_limit": 1200,
+          "send_seq": 20,
+          "sent_at": 1793403930.687766,
+          "signature": "jejECSqciWt3bDwaXVoXz384H1jcxfazgQmaCj5aXaNZH6SEkDwoUCtisjiBpJRemvqB8jSzxCwvrMnpZ8tJ8Uw",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474856,
+          "nonce": 3,
+          "micro_lamports": 20000,
+          "cu_limit": 1200,
+          "send_seq": 21,
+          "sent_at": 1793403930.9392712,
+          "signature": "2N4nfXUBxRkasChr5RPtRzjvAaLjQGYpW2fEkVQNjn4vuZHKdAB4foDoBmLRQoWgkaYcdNHwLozBsJyuBQw8y8nj",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474856,
+          "nonce": 1,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 22,
+          "sent_at": 1793403931.1594636,
+          "signature": "4bzpToyNv7JAo2rercVt3XSSidHQhJaiyREohXFG87kPx87urUSquF1LVSXpXnfLT2TVqJUpFTTnbNNXMjpm8TH7",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474856,
+          "nonce": 2,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 23,
+          "sent_at": 1793403931.435176,
+          "signature": "4tePWhhB93nXRs4n9Jft2aJfQk9Szqc7iUEpJKAgqRLGHmQsHr121HFswHvxDDmSi4uNKw8PKLtzD7Dt5UEL13Mf",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        }
+      ]
+    },
+    {
+      "validator": {
+        "vote": "3N7s9zXMZ4QqvHQR15t5GNHyqc89KduzMP7423eWiD5g",
+        "identity": "DRpbCBMxVnDK7maPM5tGv6MvB3v1sRMC86PZ8okm21hy",
+        "version": "4.4.0-rc.1",
+        "client_family": "agave-4.4.0-rc.1",
+        "feature_set": 3993424257,
+        "stake_sol": 12919679.961755414,
+        "commission": 0
+      },
+      "slot": 463474920,
+      "slot_leader_per_schedule": "DRpbCBMxVnDK7maPM5tGv6MvB3v1sRMC86PZ8okm21hy",
+      "block_leader_per_rewards": null,
+      "leader_matches_schedule": null,
+      "block": null,
+      "probes": [
+        {
+          "slot": 463474920,
+          "nonce": 4,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 24,
+          "sent_at": 1793403943.9519222,
+          "signature": "xmDJfTNe5L7zBdAz3cYLABjbwY5M9AWzzAdJKmLwYfKYPC8EcJimRqG31vVcLcZHY372JVzp3GjSDTVswomkSHe",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474920,
+          "nonce": 0,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 25,
+          "sent_at": 1793403944.151734,
+          "signature": "4gnGgWsKocB7U4QVts94HdtqrXBq7eMCAqHdiKJJ15q6HpPWEcuvcd4RwBWnUfdymTftpRqrYddUDNjbvmEYtBmV",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474920,
+          "nonce": 3,
+          "micro_lamports": 5000,
+          "cu_limit": 1200,
+          "send_seq": 26,
+          "sent_at": 1793403944.3657095,
+          "signature": "3wvAEfZTkRtRtQ1zKj6QnJPnMhBc4m96PHyG28RnBHegc2eG45eULYyzAnDidCJsQcXsMMeeJSqnUCXmXrVhescC",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474920,
+          "nonce": 5,
+          "micro_lamports": 20000,
+          "cu_limit": 1200,
+          "send_seq": 27,
+          "sent_at": 1793403944.5708697,
+          "signature": "2JhfhC7XDYSzHqigNRTDCEupCNRXXko6LHwbViuw17AUZxS7T6mFzaUZFTHfXh8G73mKJ6X2pmbY7gu9xBJctD7x",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474920,
+          "nonce": 1,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 28,
+          "sent_at": 1793403944.8098893,
+          "signature": "45ZC2iUoJuBFRKAD11p7FR6gQKxi3cJiT4ZsEq4oJViiTBoBX2LwzdWKBE4PoBFFPbfFKXvWvMNNNc8vqSCFRZN5",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463474920,
+          "nonce": 2,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 29,
+          "sent_at": 1793403945.036942,
+          "signature": "2kuRyVnCxMBJrvfkhVmsSVX58tQFC2QMGyumFAHv9RNPCfWdAmWFjhXXfrgvJ1i4UCgdDRYHMiDkBFy8nZ2m7qij",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        }
+      ]
+    },
+    {
+      "validator": {
+        "vote": "H43AYFsvhNuALQieHpLXefp1ECgEBT6oVnS4EcTsC25C",
+        "identity": "FBbqKvwLfKGZrKrfSbPJz4ymQ7zMarhRyZtu1RBkSe89",
+        "version": "0.1.1",
+        "client_family": "firedancer-0.1.1",
+        "feature_set": 4226600899,
+        "stake_sol": 1919328.420101914,
+        "commission": 1
+      },
+      "slot": 463475100,
+      "slot_leader_per_schedule": "FBbqKvwLfKGZrKrfSbPJz4ymQ7zMarhRyZtu1RBkSe89",
+      "block_leader_per_rewards": null,
+      "leader_matches_schedule": null,
+      "block": null,
+      "probes": [
+        {
+          "slot": 463475100,
+          "nonce": 4,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 30,
+          "sent_at": 1793403982.7573235,
+          "signature": "gRNH5JBVghKF1kDedZmQXwj6CwEiTYGH1vr7KWw6noroPq5KjN44m4WnMCZ6kQFsjM6RPRkB74AWeKgtcxxUMNu",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463475100,
+          "nonce": 0,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 31,
+          "sent_at": 1793403982.9595501,
+          "signature": "5iTBqXbaMRPuuu6mmVSvK3z6YBTAVbbiS35Tsbz1GnVWqHoHr6RUdgNyku3fsJEzaZKbwBExhuhCWuShgUKAeKxo",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463475100,
+          "nonce": 3,
+          "micro_lamports": 5000,
+          "cu_limit": 1200,
+          "send_seq": 32,
+          "sent_at": 1793403983.165255,
+          "signature": "PD7JbdRvoHTxtY54XEVNncD2hwgDuq3aTLaPng7XADjCsEMUzHLSddUbZJLKRFt8nawSQzussdnpXEpJ9Zp3qGU",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463475100,
+          "nonce": 5,
+          "micro_lamports": 20000,
+          "cu_limit": 1200,
+          "send_seq": 33,
+          "sent_at": 1793403983.3759935,
+          "signature": "3rG21QkuCtJDvBN4MkHL2T47cDKp4HDrwnyFbRsPUSqYFSd7kymhsp5ayoBBGRC9V9hQruPWoUJeJ3EhQ7Jh9hTV",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463475100,
+          "nonce": 1,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 34,
+          "sent_at": 1793403983.5774584,
+          "signature": "5vy68YjxggQ6sGkfcoQ4XXa8qsdbdShMVb7reLttoBinCCEiD9D2ZR4tHmouE9jM2QRmtdHLrGcA8u6u8HGnRbbQ",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        },
+        {
+          "slot": 463475100,
+          "nonce": 2,
+          "micro_lamports": 1000,
+          "cu_limit": 1200,
+          "send_seq": 35,
+          "sent_at": 1793403983.7767498,
+          "signature": "3aLZBbiTLeCXHA5yGHHCziw9wkou5HH6PmFAdK3xQ41SxfFdrCR8rgSs5AX75po2Uybc5romNwDEQp8DLzHP5NFk",
+          "landed": false,
+          "tx_index": null,
+          "fee_lamports": null,
+          "cu_consumed": null
+        }
+      ]
+    }
+  ],
+  "end_balance_lamports": 890880,
+  "spent_lamports": 180204,
+  "analysis": {
+    "rows": [
+      {
+        "slot": 463474604,
+        "client_family": "agave-4.4.0",
+        "landed": 0,
+        "verdict": "insufficient data"
+      },
+      {
+        "slot": 463474656,
+        "client_family": "agave-4.3.2",
+        "landed": 0,
+        "verdict": "insufficient data"
+      },
+      {
+        "slot": 463474728,
+        "client_family": "firedancer-26.10.5",
+        "landed": 0,
+        "verdict": "insufficient data"
+      },
+      {
+        "slot": 463474856,
+        "client_family": "firedancer-26.10.4",
+        "landed": 0,
+        "verdict": "insufficient data"
+      },
+      {
+        "slot": 463474920,
+        "client_family": "agave-4.4.0-rc.1",
+        "landed": 0,
+        "verdict": "insufficient data"
+      },
+      {
+        "slot": 463475100,
+        "client_family": "firedancer-0.1.1",
+        "landed": 0,
+        "verdict": "insufficient data"
+      }
+    ],
+    "summary": {}
+  }
+}

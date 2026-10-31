@@ -1,0 +1,8 @@
+data/leader_schedule.json
+data/plan*.json
+data/dryrun.json
+data/docker_dry.json
+__pycache__/
+*.pyc
+keypair*.json
+.env
