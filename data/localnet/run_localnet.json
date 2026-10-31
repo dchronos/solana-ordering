@@ -1,0 +1,209 @@
+{
+  "mode": "live",
+  "rpc": "http://127.0.0.1:8899",
+  "epoch": {
+    "absoluteSlot": 69,
+    "blockHeight": 69,
+    "epoch": 0,
+    "slotIndex": 69,
+    "slotsInEpoch": 432000,
+    "transactionCount": 68
+  },
+  "families": {
+    "agave-4.4.0": [
+      "2cYCaWKzjEKYF3UaRgGGmqSru8WCtdavM3YK9X9Z7yRs"
+    ]
+  },
+  "windows": [
+    {
+      "slot": 82,
+      "vote": "2cYCaWKzjEKYF3UaRgGGmqSru8WCtdavM3YK9X9Z7yRs",
+      "identity": "2F3KRXAk3VdJZ2xcHUooWHi9PM1rfeik5ipWFBLgBeCK",
+      "version": "4.4.0",
+      "client_family": "agave-4.4.0"
+    }
+  ],
+  "estimated_transactions": 8,
+  "estimated_lamports": 47680,
+  "cap_lamports": 50000000,
+  "payer": "CwC8ZLTsXCUh2nsdy4DZFbzXo8nKyp3Zr5s3RRvbqQUK",
+  "start_balance_lamports": 5000000000,
+  "measurements": [
+    {
+      "validator": {
+        "vote": "2cYCaWKzjEKYF3UaRgGGmqSru8WCtdavM3YK9X9Z7yRs",
+        "identity": "2F3KRXAk3VdJZ2xcHUooWHi9PM1rfeik5ipWFBLgBeCK",
+        "version": "4.4.0",
+        "client_family": "agave-4.4.0",
+        "feature_set": 3722100051,
+        "stake_sol": 999999.99771712,
+        "commission": 0
+      },
+      "slot": 102,
+      "slot_leader_per_schedule": "2F3KRXAk3VdJZ2xcHUooWHi9PM1rfeik5ipWFBLgBeCK",
+      "block_leader_per_rewards": "2F3KRXAk3VdJZ2xcHUooWHi9PM1rfeik5ipWFBLgBeCK",
+      "leader_matches_schedule": true,
+      "on_target": true,
+      "blocks": {
+        "102": {
+          "blockhash": "G3SRd3ZcgrPDhixG4Nrd9ucDSxqM1SNjvBAHyx7u1V2H",
+          "previousBlockhash": "2unqY3qMi571AfZzUsfT8gtCfWisXQTPBhkvH96YENap",
+          "blockTime": 1793410630,
+          "blockHeight": 102,
+          "leader_per_rewards": "2F3KRXAk3VdJZ2xcHUooWHi9PM1rfeik5ipWFBLgBeCK",
+          "tx_count": 9,
+          "signatures": [
+            "59WpKBNEQqpXd9qyEofPfsQsQRdYrP9C7ezL6ecGnspTxXjX4cALJYqqENPDvUvgsSQHy7azyuynJkf8BQq7HsFq",
+            "WAeKbbq3818rhvkFvKa87kHqmVAmH46KJum3kGTHn4n7FMxuHo9Zb66G4eAvPpLgTkkgjySs9fyjoiydw1pvkB7",
+            "2u92AcHYyEgq6MhdxnhL6MLvX8CCXFoPQQ4jHExPoyQmhF7j2g6bRE6Mz4UQ3xrhP8T7urn4RV5ZFA8qWizP5nnX",
+            "2LSErDuSGxpPpUV8CDaPhFYL6fPaG4tZh5ffLNgHnBs4yaHmN2rCsgK4YCni11yR9rofsHzycY5fce2eMUYUHaK5",
+            "2WDT7EJxH5F7TDem46kjEiczWeJgLfzet9DzJ2dyRm676zyLmfLA67vJ7DJL9XqM4X9Z91L4yZFZk9LDX6oPQ2TD",
+            "sPHCcZKUAgysvwbTyV1UEiPvqZvGqMsGiG2wgE8t4LHhDqwTqy4jnNNzePw89AA2yr88zn3s7jfikaz32L4DsWx",
+            "4e5t5GPryUXLULH5xptBHvkzep4Wp1xg8dsjY54CX3Yn6eGRz4ri2YnucEwKn9LSYW4ARdBS59N6KKBqA1NRRGqe",
+            "4srcMTAA6AnfYoatSwUgMLHx9KvJJuTdVMGMz253dKZHu5qsYyiZPCPfJM1erH61a6DcucyebG5RrdjUgvD1oT9g",
+            "479J7jSdsJgQarjJ6XZjGdMFKNKqMMkNXzmoFXwqHaahXZovEGGGcSAV4sasJNCErvSy13T3yM8zXv4tRZiV3L8R"
+          ]
+        }
+      },
+      "probes": [
+        {
+          "slot": 102,
+          "nonce": 4,
+          "micro_lamports": 500000,
+          "cu_limit": 1200,
+          "send_seq": 0,
+          "sent_at": 1793410630.7122808,
+          "signature": "WAeKbbq3818rhvkFvKa87kHqmVAmH46KJum3kGTHn4n7FMxuHo9Zb66G4eAvPpLgTkkgjySs9fyjoiydw1pvkB7",
+          "landed": true,
+          "tx_index": 1,
+          "fee_lamports": 5600,
+          "cu_consumed": 450
+        },
+        {
+          "slot": 102,
+          "nonce": 2,
+          "micro_lamports": 200000,
+          "cu_limit": 1200,
+          "send_seq": 1,
+          "sent_at": 1793410630.7131724,
+          "signature": "2LSErDuSGxpPpUV8CDaPhFYL6fPaG4tZh5ffLNgHnBs4yaHmN2rCsgK4YCni11yR9rofsHzycY5fce2eMUYUHaK5",
+          "landed": true,
+          "tx_index": 3,
+          "fee_lamports": 5240,
+          "cu_consumed": 450
+        },
+        {
+          "slot": 102,
+          "nonce": 7,
+          "micro_lamports": 700000,
+          "cu_limit": 1200,
+          "send_seq": 2,
+          "sent_at": 1793410630.7138975,
+          "signature": "2u92AcHYyEgq6MhdxnhL6MLvX8CCXFoPQQ4jHExPoyQmhF7j2g6bRE6Mz4UQ3xrhP8T7urn4RV5ZFA8qWizP5nnX",
+          "landed": true,
+          "tx_index": 2,
+          "fee_lamports": 5840,
+          "cu_consumed": 450
+        },
+        {
+          "slot": 102,
+          "nonce": 1,
+          "micro_lamports": 400000,
+          "cu_limit": 1200,
+          "send_seq": 3,
+          "sent_at": 1793410630.7145805,
+          "signature": "2WDT7EJxH5F7TDem46kjEiczWeJgLfzet9DzJ2dyRm676zyLmfLA67vJ7DJL9XqM4X9Z91L4yZFZk9LDX6oPQ2TD",
+          "landed": true,
+          "tx_index": 4,
+          "fee_lamports": 5480,
+          "cu_consumed": 450
+        },
+        {
+          "slot": 102,
+          "nonce": 3,
+          "micro_lamports": 600000,
+          "cu_limit": 1200,
+          "send_seq": 4,
+          "sent_at": 1793410630.7157085,
+          "signature": "sPHCcZKUAgysvwbTyV1UEiPvqZvGqMsGiG2wgE8t4LHhDqwTqy4jnNNzePw89AA2yr88zn3s7jfikaz32L4DsWx",
+          "landed": true,
+          "tx_index": 5,
+          "fee_lamports": 5720,
+          "cu_consumed": 450
+        },
+        {
+          "slot": 102,
+          "nonce": 0,
+          "micro_lamports": 0,
+          "cu_limit": 1200,
+          "send_seq": 5,
+          "sent_at": 1793410630.7169278,
+          "signature": "4e5t5GPryUXLULH5xptBHvkzep4Wp1xg8dsjY54CX3Yn6eGRz4ri2YnucEwKn9LSYW4ARdBS59N6KKBqA1NRRGqe",
+          "landed": true,
+          "tx_index": 6,
+          "fee_lamports": 5000,
+          "cu_consumed": 450
+        },
+        {
+          "slot": 102,
+          "nonce": 5,
+          "micro_lamports": 100000,
+          "cu_limit": 1200,
+          "send_seq": 6,
+          "sent_at": 1793410630.7205153,
+          "signature": "4srcMTAA6AnfYoatSwUgMLHx9KvJJuTdVMGMz253dKZHu5qsYyiZPCPfJM1erH61a6DcucyebG5RrdjUgvD1oT9g",
+          "landed": true,
+          "tx_index": 7,
+          "fee_lamports": 5120,
+          "cu_consumed": 450
+        },
+        {
+          "slot": 102,
+          "nonce": 6,
+          "micro_lamports": 300000,
+          "cu_limit": 1200,
+          "send_seq": 7,
+          "sent_at": 1793410630.7213118,
+          "signature": "479J7jSdsJgQarjJ6XZjGdMFKNKqMMkNXzmoFXwqHaahXZovEGGGcSAV4sasJNCErvSy13T3yM8zXv4tRZiV3L8R",
+          "landed": true,
+          "tx_index": 8,
+          "fee_lamports": 5360,
+          "cu_consumed": 450
+        }
+      ]
+    }
+  ],
+  "end_balance_lamports": 4999956640,
+  "spent_lamports": 43360,
+  "analysis": {
+    "rows": [
+      {
+        "slot": 102,
+        "leader": "2F3KRXAk3VdJZ2xcHUooWHi9PM1rfeik5ipWFBLgBeCK",
+        "client_family": "agave-4.4.0",
+        "version": "4.4.0",
+        "stake_sol": 999999.99771712,
+        "landed": 8,
+        "block_tx_count": 9,
+        "correlation": {
+          "fee_desc": 0.452,
+          "send_seq": 1.0,
+          "sent_at": 1.0,
+          "nonce": 0.119
+        },
+        "best_rule": "send_seq",
+        "best_correlation": 1.0
+      }
+    ],
+    "summary": {
+      "agave-4.4.0": {
+        "blocks": 1,
+        "landed_total": 8,
+        "rule_votes": {
+          "send_seq": 1
+        },
+        "mean_best_corr": 1.0
+      }
+    }
+  }
+}

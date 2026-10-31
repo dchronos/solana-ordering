@@ -109,6 +109,27 @@ plan of 6 families x 2 slots x 8 probes estimates 0.000931 SOL and the default c
 is 0.0015 SOL, both printed by the dry run before anything is signed. The bounty's
 0.05 SOL limit is ~50x what these runs cost.
 
+## Localnet validation
+
+The pipeline is exercised end to end against `solana-test-validator` before any
+mainnet SOL is committed, so a defect in send, harvest or attribution cannot be
+mistaken for a property of a leader:
+
+```bash
+solana-test-validator --ledger /tmp/lv --reset --rpc-port 8899 \
+  --gossip-port 8100 --dynamic-port-range 8200-8300 &
+solana airdrop 5 --url http://127.0.0.1:8899
+python src/scheduler_probe.py --live --rpc http://127.0.0.1:8899 \
+  --min-stake-sol 0 --per-family 2 --per-slot 8 --lead-slots 12 --gap 1 --settle 6 \
+  --out data/localnet/run_localnet.json
+```
+
+`data/localnet/run_localnet.json` is a real run from that setup: 8/8 probes landed
+in a single block by the target leader, `leader_matches_schedule: true`, and
+`scripts/verify_blocks.py` re-derives the positions from the local ledger. Devnet
+was not usable: its RPC faucet returns 410 and the web faucet requires a GitHub
+login, so there was no free way to fund an end-to-end run there.
+
 ## Report
 
 `REPORT.md` is the write-up required by the bounty: per-validator results with
