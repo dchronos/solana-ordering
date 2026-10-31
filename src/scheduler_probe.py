@@ -647,6 +647,24 @@ def run(args: argparse.Namespace) -> dict:
         "cap_lamports": args.max_lamports,
     }
     if args.dry_run:
+        # A dry run still has to tell the truth about the cap it was given: on a
+        # plan that costs more than the cap, live mode would refuse at the first
+        # send that crosses it, so the operator must not read this as "fits".
+        plan["within_cap"] = plan["estimated_lamports"] <= args.max_lamports
+        if not plan["within_cap"]:
+            per_slot = plan["estimated_lamports"] // max(1, plan["estimated_transactions"])
+            affordable = args.max_lamports // max(1, per_slot)
+            if affordable:
+                fate = (
+                    f"a live run would stop after about {affordable} of "
+                    f"{plan['estimated_transactions']} sends"
+                )
+            else:
+                fate = "a live run would refuse its first send"
+            log(
+                f"dry-run plan costs {plan['estimated_lamports']} lamports but the cap is "
+                f"{args.max_lamports}: {fate}"
+            )
         return plan
 
     payer = load_keypair(args.keypair)

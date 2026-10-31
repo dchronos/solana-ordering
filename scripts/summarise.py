@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print the per-validator, per-client ordering summary from the raw run files.
+"""Print the per-leader, per-client ordering summary from the raw run files.
 
 Every number here is derived from signatures recorded in data/, so it can be
 checked against the chain with verify_blocks.py. Judging should not require
@@ -59,9 +59,11 @@ def main() -> int:
     by_validator = collections.defaultdict(list)
     for row in rows:
         by_family[row["client_family"]].append(row)
+        # keyed by the block's fee recipient, which is what rewards[] gives us; one
+        # validator identity can own two collectors, so this is not an identity count
         by_validator[row["leader"]].append(row)
 
-    print(f"{len(rows)} blocks, {len(by_validator)} validators, "
+    print(f"{len(rows)} blocks, {len(by_validator)} revenue leaders, "
           f"{sum(r['landed'] for r in rows)} probes\n")
     print(f"{'client':22s} {'blocks':>6s} {'probes':>6s} {'arrival':>8s} {'fee range':>16s}")
     for family in sorted(by_family):
