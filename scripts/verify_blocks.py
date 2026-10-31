@@ -61,6 +61,16 @@ def main() -> int:
                 print(f"slot {slot_key}: block not retrievable from this endpoint")
                 problems += 1
                 continue
+            # A slot number alone does not identify a block: the same slot exists on
+            # every cluster. Without this check, verifying a localnet run against
+            # mainnet silently compares two unrelated blocks and reports nonsense.
+            if recorded.get("blockhash") and blk.get("blockhash") != recorded["blockhash"]:
+                print(
+                    f"\nslot {slot_key}: wrong cluster or ledger - recorded blockhash "
+                    f"{recorded['blockhash'][:12]}…, chain returned {str(blk.get('blockhash'))[:12]}…"
+                )
+                problems += 1
+                continue
             leader = _leader_from_rewards(blk)
             txs = blk.get("transactions") or []
             print(f"\nslot {slot_key}  leader={leader}  txs={len(txs)}  blockhash={blk.get('blockhash')}")

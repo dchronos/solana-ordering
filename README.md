@@ -129,7 +129,10 @@ python src/scheduler_probe.py --live --rpc http://127.0.0.1:8899 \
 
 `data/localnet/run_localnet.json` is a real run from that setup: 8/8 probes landed
 in a single block by the target leader, `leader_matches_schedule: true`, and
-`scripts/verify_blocks.py` re-derives the positions from the local ledger. Devnet
+`scripts/verify_blocks.py` re-derived the positions from that ledger while it was
+live. The ledger itself was throwaway, so re-verification needs your own validator;
+the verifier notices that by comparing blockhashes and reports "wrong cluster or
+ledger" rather than comparing slot numbers across clusters. Devnet
 was not usable: its RPC faucet returns 410 and the web faucet requires a GitHub
 login, so there was no free way to fund an end-to-end run there.
 

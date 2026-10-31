@@ -7,7 +7,7 @@
 | `run_v2.json` | **canonical** — first run with parallel primary sends |
 | `run_v3.json` | **canonical** — widest fee sweep (5 000 to 17 600 lamports) |
 | `run_v4.json`, `run_v5.json` | **canonical** — gap-filling runs (`--only-identity`) over the largest validators |
-| `localnet/run_localnet.json` | **canonical** — pipeline validation against `solana-test-validator` |
+| `localnet/run_localnet.json` | **canonical** — pipeline validation against `solana-test-validator`, verified against that validator while its ledger was live |
 | `run_smoke.json`, `run_smoke2.json`, `run_final.json`, `run_3.json`, `run_4.json` | superseded, kept for the record |
 | `leader_schedule.json`, `plan*.json`, `dryrun.json`, `docker_dry.json` | generated, gitignored |
 
@@ -16,3 +16,10 @@ block that actually contains them, and a block's fee recipient was not resolved 
 a validator identity. Their recorded positions can therefore disagree with the
 chain. They are not used by `scripts/summarise.py` and are excluded from every
 number in `README.md` and `REPORT.md`.
+
+The localnet run cannot be re-verified from this repository alone: the throwaway
+ledger it was measured against was deleted. `scripts/verify_blocks.py` detects this
+by comparing blockhashes and says "wrong cluster or ledger" instead of comparing
+the slot against a mainnet block that happens to share its number. To reproduce,
+run the sequence in the README's localnet section and verify against your own
+`--rpc http://127.0.0.1:8899`.
