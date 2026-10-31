@@ -101,13 +101,16 @@ Measured, from the payer balance before and after each run:
 |---|---|---|
 | `run_v2.json` | 88 | 0.000440 |
 | `run_v3.json` | 56 | 0.000904 |
-| `run_live.json` (via `docker compose`, as a non-root user) | 24 | 0.000361 |
+| `run_live.json` (via `docker compose`, as a non-root user) | 24 | 0.000271 |
+| `run_v4.json` | 64 | 0.000515 |
+| `run_v5.json` | 40 | 0.000221 |
 
-The second costs more because its fee ladder is deliberately steep (up to 10 500 000
-micro-lamports/CU) to give the fee hypothesis a real signal to fail on. The default
-plan of 6 families x 2 slots x 8 probes estimates 0.000931 SOL and the default cap
-is 0.0015 SOL, both printed by the dry run before anything is signed. The bounty's
-0.05 SOL limit is ~50x what these runs cost.
+`run_v3` costs more because its fee ladder is deliberately steep (up to 10 500 000
+micro-lamports/CU) to give the fee hypothesis a real signal to fail on. Total
+across every run in the repository: **0.00235 SOL**, about 20x under the bounty's
+0.05 SOL limit. The default plan of 6 families x 2 slots x 8 probes estimates
+0.000931 SOL and the default cap is 0.0015 SOL; both are printed by the dry run
+before anything is signed.
 
 ## Localnet validation
 
@@ -155,23 +158,23 @@ our transactions' positions again, independently of the analysis block:
 python scripts/verify_blocks.py data/run_v3.json   # -> "verification: consistent"
 ```
 
-**24 blocks, 189 probes, 6 client builds: ordering is arrival, not price.**
+**40 blocks, 293 probes, 22 validators, 6 client builds: ordering is arrival, not price.**
 
-Pooled over the three runs in `data/`, the arrival rule scores **1.00 in every
+Pooled over the six runs in `data/`, the arrival rule scores **1.00 in every
 block** and the fee rule has no consistent sign:
 
 | client | blocks | probes | arrival rule (min) | fee rule range |
 |---|---|---|---|---|
-| agave 4.3.2 | 5 | 39 | 1.00 | −0.43 … +0.74 |
-| agave 4.4.0 | 6 | 47 | 1.00 | −0.33 … +0.55 |
-| agave 4.4.0-rc.1 | 3 | 22 | 1.00 | −0.05 … +0.71 |
-| firedancer 0.1.1 | 2 | 16 | 1.00 | −0.17 … −0.05 |
-| firedancer 26.10.4 | 4 | 32 | 1.00 | −0.26 … +0.55 |
-| firedancer 26.10.5 | 4 | 33 | 1.00 | −0.57 … +0.02 |
+| agave-4.3.2 | 10 | 71 | **1.00** | -1.00 … +0.74 |
+| agave-4.4.0 | 11 | 79 | **1.00** | -1.00 … +0.80 |
+| agave-4.4.0-rc.1 | 3 | 22 | **1.00** | -0.05 … +0.71 |
+| firedancer-0.1.1 | 4 | 24 | **1.00** | -0.40 … +0.20 |
+| firedancer-26.10.4 | 6 | 48 | **1.00** | -0.59 … +0.62 |
+| firedancer-26.10.5 | 6 | 49 | **1.00** | -0.57 … +0.48 |
 
 The fee-rule column is the point: a rule that was real would hold its sign. Here
-it swings from −0.57 to +0.74 across blocks of the same client, which is what a
-non-predictor looks like when you measure it 24 times.
+it swings from −1.00 to +0.80 across blocks of the same client, which is what a
+non-predictor looks like when you measure it 40 times.
 
 `data/run_v3.json`, the run with the widest fee sweep (0 to 10 500 000
 micro-lamports/CU, a **3.5x spread in the fee actually charged**, 5 000 to 17 600
@@ -200,7 +203,7 @@ transactions arrived, and the fee is not the sort key.
 
 ## Limits
 
-24 blocks is not a survey of the cluster, and six builds is not every build. What
+40 blocks is not a survey of the cluster, and six builds is not every build. What
 the data supports is narrow and precise: for these leaders, on these clients, in
 these blocks, position followed arrival order and not price. `--per-family` and `--windows` widen it; the spend cap
 in the bounty (0.05 SOL) is roughly 200x the cost of the runs recorded here.

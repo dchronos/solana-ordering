@@ -257,14 +257,25 @@ def choose_windows(
     families: dict[str, list[str]],
     per_family: int,
     lead_slots: int,
+    only_identity: set[str] | None = None,
 ) -> list[tuple[int, Validator]]:
     """Pick upcoming leader slots, spread across client families.
 
     We prefer slots that are far enough ahead to be reachable (a few seconds) but
     not so far that the run stalls. One slot per validator per round, so that a slow
     validator does not consume the whole budget.
+
+    `only_identity` restricts the choice to a set of node identities, which is how
+    a follow-up run covers validators that the family round-robin happened to skip
+    instead of re-measuring the ones already in the data.
     """
     by_identity = {v.identity: v for v in validators.values()}
+    if only_identity:
+        families = {
+            fam: [vote for vote in votes if validators[vote].identity in only_identity]
+            for fam, votes in families.items()
+        }
+        families = {fam: votes for fam, votes in families.items() if votes}
     chosen: list[tuple[int, Validator]] = []
     for family, votes in families.items():
         picked = 0
@@ -599,12 +610,26 @@ def run(args: argparse.Namespace) -> dict:
     epoch = rpc.epoch_info()
 
     eligible = {v: val for v, val in validators.items() if val.stake_sol >= args.min_stake_sol}
+    # A gap-filling run names the validators it wants. Filter before the per-family
+    # truncation below, or a target that is not already in the top-N by stake can
+    # never be selected and the run silently measures somebody else.
+    wanted = {i for i in (args.only_identity or [])}
+    if wanted:
+        eligible = {v: val for v, val in eligible.items() if val.identity in wanted}
     families: dict[str, list[str]] = {}
     for val in sorted(eligible.values(), key=lambda x: -x.stake_sol):
         families.setdefault(val.client_family, []).append(val.vote)
 
     families = {f: vs[: args.per_family] for f, vs in families.items()}
-    windows = choose_windows(owners, validators, epoch["absoluteSlot"], families, args.per_family, args.lead_slots)
+    windows = choose_windows(
+        owners,
+        validators,
+        epoch["absoluteSlot"],
+        families,
+        args.per_family,
+        args.lead_slots,
+        only_identity={i for i in (args.only_identity or [])},
+    )
 
     plan = {
         "mode": "dry-run" if args.dry_run else "live",
@@ -842,6 +867,13 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--keypair", default=None, help="path to base58 secret key file (never committed)")
     p.add_argument("--min-stake-sol", type=float, default=1_000_000.0)
     p.add_argument("--per-family", type=int, default=1, help="validators measured per client family")
+    p.add_argument(
+        "--only-identity",
+        action="append",
+        default=None,
+        dest="only_identity",
+        help="repeatable; measure only these node identities (for gap-filling runs)",
+    )
     p.add_argument("--per-slot", type=int, default=8, help="competing transactions per leader slot")
     p.add_argument("--cu-limit", type=int, default=1_200)
     p.add_argument("--fee-base", type=int, default=0, help="lowest priority fee, micro-lamports per CU")

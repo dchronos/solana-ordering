@@ -1,6 +1,6 @@
 # Report: how Solana leaders order transactions inside a block
 
-Measurement dates: **2026-10-30 22:47 UTC – 2026-10-31 01:27 UTC**. All runs are
+Measurement dates: **2026-10-30 22:47 UTC – 2026-10-31 01:38 UTC**. All runs are
 after the Alpenglow upgrade of 2026-10-21, so no measurement mixes pre- and
 post-upgrade behaviour. Network: Solana mainnet-beta throughout.
 
@@ -8,14 +8,14 @@ post-upgrade behaviour. Network: Solana mainnet-beta throughout.
 
 **Ordering is arrival order. The priority fee is not the sort key.**
 
-Across 30 distinguishable blocks, 17 validator identities and 6 client builds
+Across 40 distinguishable blocks, 22 validator identities and 6 client builds
 (Agave 4.3.2, 4.4.0, 4.4.0-rc.1; Firedancer 0.1.1, 26.10.4, 26.10.5), the rank
 correlation between our transactions' send order and their position in the block
 is **1.00 in every single block**. The same correlation against the fee actually
 charged averages near zero and does not hold a sign: within one client it ranges
-from −1.00 to +0.80. That is a non-predictor, measured 30 times.
+from −1.00 to +0.80. That is a non-predictor, measured 40 times.
 
-The strictness is worth stating precisely: 1.00 with 7–11 probes per block means
+The strictness is worth stating precisely: 1.00 with 4–12 probes per block means
 the block order is the send order **exactly**, not approximately. There is no
 reordering, no interleaving of our batch with our own later sends, and no evidence
 of fee-priority insertion *within* a batch.
@@ -32,25 +32,30 @@ four candidate rules by Spearman rank correlation against the observed positions
 
 ## Per-validator results
 
-| validator | version | blocks | probes | arrival rule | fee rule | measured (UTC) |
+| validator | version | blocks | probes | arrival | fee range | measured (UTC) |
 |---|---|---|---|---|---|---|
-| `FBbqKv…Se89` | 0.1.1 | 4 | 24 | **1.00** | -0.40 … +0.20 | 2026-10-31 01:00 UTC – 01:25 UTC |
-| `E1r4Ps…dxHL` | 4.3.2 | 4 | 27 | **1.00** | -1.00 … -0.07 | 2026-10-30 23:51 UTC – 2026-10-31 01:26 UTC |
-| `Fd7btg…69Nk` | 4.4.0 | 4 | 24 | **1.00** | -1.00 … +0.80 | 2026-10-31 00:57 UTC – 01:25 UTC |
-| `87CcUx…LJL5` | 26.10.4 | 2 | 16 | **1.00** | -0.26 … +0.55 | 2026-10-31 00:57 UTC – 01:07 UTC |
-| `CQdLgw…ow12` | 26.10.4 | 2 | 16 | **1.00** | -0.24 … +0.02 | 2026-10-31 01:02 UTC – 01:07 UTC |
-| `9eGrDo…8FoY` | 26.10.5 | 2 | 15 | **1.00** | -0.57 … +0.02 | 2026-10-31 00:57 UTC – 01:08 UTC |
-| `GoeW4a…tDK9` | 4.4.0-rc.1 | 2 | 14 | **1.00** | -0.05 … +0.71 | 2026-10-31 01:04 UTC – 01:09 UTC |
-| `JD549H…HybB` | 26.10.5 | 1 | 11 | **1.00** | -0.04 … -0.04 | 2026-10-30 23:58 UTC |
-| `JUPiTE…1h4b` | 26.10.5 | 1 | 7 | **1.00** | -0.14 … -0.14 | 2026-10-31 00:57 UTC |
-| `5pPRHn…HzSm` | 4.3.2 | 1 | 4 | **1.00** | +0.00 … +0.00 | 2026-10-30 23:51 UTC |
-| `9UM8wQ…Jd9i` | 4.3.2 | 1 | 8 | **1.00** | -0.43 … -0.43 | 2026-10-31 01:07 UTC |
-| `CAo1dC…Sve4` | 4.3.2 | 1 | 8 | **1.00** | +0.74 … +0.74 | 2026-10-31 01:07 UTC |
-| `EUcJwf…XctB` | 4.4.0 | 1 | 7 | **1.00** | +0.46 … +0.46 | 2026-10-31 00:56 UTC |
-| `HEL1US…e2TU` | 4.4.0 | 1 | 8 | **1.00** | +0.38 … +0.38 | 2026-10-31 00:57 UTC |
-| `shftkx…Vikj` | 4.4.0 | 1 | 8 | **1.00** | +0.55 … +0.55 | 2026-10-31 00:57 UTC |
-| `J1to5o…Mr4X` | 4.4.0 | 1 | 8 | **1.00** | +0.52 … +0.52 | 2026-10-31 00:57 UTC |
-| `hy1oMa…Xnwu` | 4.4.0-rc.1 | 1 | 8 | **1.00** | +0.29 … +0.29 | 2026-10-31 01:08 UTC |
+| `Fd7btg…69Nk` | 4.4.0 | 5 | 32 | **1.00** | -1.00 … +0.80 | 2026-10-30 23:51 – 01:38 |
+| `FBbqKv…Se89` | 0.1.1 | 4 | 24 | **1.00** | -0.40 … +0.20 | 2026-10-30 23:51 – 01:25 |
+| `E1r4Ps…dxHL` | 4.3.2 | 4 | 27 | **1.00** | -1.00 … -0.07 | 2026-10-30 23:51 – 01:26 |
+| `CQdLgw…ow12` | 26.10.4 | 3 | 24 | **1.00** | -0.24 … +0.62 | 2026-10-31 01:02 – 01:38 |
+| `9eGrDo…8FoY` | 26.10.5 | 3 | 23 | **1.00** | -0.57 … +0.02 | 2026-10-31 00:57 – 01:39 |
+| `87CcUx…LJL5` | 26.10.4 | 2 | 16 | **1.00** | -0.26 … +0.55 | 2026-10-30 23:58 – 01:07 |
+| `JUPiTE…1h4b` | 26.10.5 | 2 | 15 | **1.00** | -0.14 … +0.48 | 2026-10-31 00:57 – 01:39 |
+| `CAo1dC…Sve4` | 4.3.2 | 2 | 16 | **1.00** | -0.14 … +0.74 | 2026-10-31 01:07 – 01:38 |
+| `GoeW4a…tDK9` | 4.4.0-rc.1 | 2 | 14 | **1.00** | -0.05 … +0.71 | 2026-10-31 01:04 – 01:09 |
+| `pSo1KZ…nkfc` | 26.10.4 | 1 | 8 | **1.00** | -0.59 … -0.59 | 2026-10-31 01:38 |
+| `JD549H…HybB` | 26.10.5 | 1 | 11 | **1.00** | -0.04 … -0.04 | 2026-10-30 23:58 |
+| `5pPRHn…HzSm` | 4.3.2 | 1 | 4 | **1.00** | +0.00 … +0.00 | 2026-10-30 23:51 |
+| `9UM8wQ…Jd9i` | 4.3.2 | 1 | 8 | **1.00** | -0.43 … -0.43 | 2026-10-31 01:07 |
+| `EvnRmn…qDo4` | 4.3.2 | 1 | 8 | **1.00** | -0.48 … -0.48 | 2026-10-31 01:39 |
+| `5Cchr1…q9Ux` | 4.3.2 | 1 | 8 | **1.00** | +0.38 … +0.38 | 2026-10-31 01:43 |
+| `EUcJwf…XctB` | 4.4.0 | 1 | 7 | **1.00** | +0.46 … +0.46 | 2026-10-31 00:56 – 00:56 |
+| `HEL1US…e2TU` | 4.4.0 | 1 | 8 | **1.00** | +0.38 … +0.38 | 2026-10-31 00:57 |
+| `shftkx…Vikj` | 4.4.0 | 1 | 8 | **1.00** | +0.55 … +0.55 | 2026-10-31 00:57 |
+| `J1to5o…Mr4X` | 4.4.0 | 1 | 8 | **1.00** | +0.52 … +0.52 | 2026-10-31 00:57 |
+| `C8Bey3…JP1k` | 4.4.0 | 1 | 8 | **1.00** | -0.02 … -0.02 | 2026-10-31 01:43 |
+| `Ed9WjP…a2Zv` | 4.4.0 | 1 | 8 | **1.00** | +0.41 … +0.41 | 2026-10-31 01:45 |
+| `hy1oMa…Xnwu` | 4.4.0-rc.1 | 1 | 8 | **1.00** | +0.29 … +0.29 | 2026-10-31 01:08 |
 
 `arrival rule` is the Spearman correlation between send order and in-block
 position; `fee rule` is the same against the fee paid. A value of 1.00 means the
@@ -129,5 +134,5 @@ SOLANA_SECRET_KEY=<base58> docker compose up       # live, capped, writes data/
 
 Raw data for every claim is in `data/`: per-probe nonce, signature, fee, compute,
 send timestamp, landing slot and block index, plus per-block signature lists.
-Total spent across all runs in this repository: **0.0017 SOL**, against the
+Total spent across all runs in this repository: **0.00235 SOL**, against the
 bounty's 0.05 SOL limit.
