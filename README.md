@@ -58,6 +58,17 @@ saturated block can be excluded rather than used to explain an odd result.
 repeats, while nonces are shuffled independently, so `fee_desc` and `nonce` test
 different hypotheses on the same batch.
 
+## Every confound the question names, and what this does about it
+
+| consideration | how it is handled |
+|---|---|
+| **Leader schedule and leader types** | Targets are picked from the epoch schedule by client family; the producing validator is then read back from the block, not assumed. `leader_matches_schedule` records disagreement so a skipped slot is visible instead of silently reassigning credit. |
+| **Path from backend to the executing node** | The path is identical for every probe in a batch: same provider, same connections, same blockhash. It is deliberately a single hop (one RPC plus a backup); a different path can change arrival and therefore position without the scheduler changing, which is why it is fixed and stated rather than varied. |
+| **Interaction of our own transactions** | Probes are self-transfers of distinct amounts, so the only shared resource is the leader's queue. Fee and nonce are shuffled independently of send order, so a batch cannot manufacture a fee correlation. Any probe that lands in a different block is attributed there, not to the intended slot. |
+| **Competition inside the block** | Every block's fill is recorded (`block_tx_count`, 200–670 here) and every probe's absolute position is kept, so a rule that only bites under contention can be looked for. What this cannot see is a rule that appears only in saturated blocks: our batches were never the majority of a block. |
+| **Send order** | Pre-signed, then all primaries fired at once, so `send_seq` is the order of departure, not the order of construction. `sent_at` is stamped as each send leaves and correlates 1.00 with `send_seq`, which confirms the two are consistent rather than an artefact of the thread pool. |
+| **Noise versus rule** | Four rules are scored per block by rank correlation; the null (`nonce`) and the competitor (`fee_desc`) both get a turn. A rule is claimed only if it wins every block *and* holds its sign; the fee rule swings −1.00 … +0.80 across blocks of the same client, which is what noise looks like at this sample size. |
+
 ## Safety
 
 - **Dry run is the default.** `--live` is required to sign anything.
