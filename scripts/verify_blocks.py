@@ -13,6 +13,9 @@ import argparse
 import json
 import pathlib
 import sys
+import time
+
+import requests
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 from scheduler_probe import Rpc, _leader_from_rewards  # noqa: E402
@@ -21,26 +24,46 @@ from scheduler_probe import Rpc, _leader_from_rewards  # noqa: E402
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("run", help="path to data/run_live.json")
-    ap.add_argument("--rpc", default="https://api.mainnet-beta.solana.com")
+    ap.add_argument("--rpc", action="append", default=None,
+                    help="repeatable; public RPCs rate-limit, so try several")
     args = ap.parse_args()
 
     run = json.loads(pathlib.Path(args.run).read_text())
-    rpc = Rpc(args.rpc)
+    urls = args.rpc or [
+        "https://solana-rpc.publicnode.com",
+        "https://api.mainnet-beta.solana.com",
+    ]
+    rpc = Rpc(urls[0])
+    rpc.read_urls = list(dict.fromkeys(urls))
     problems = 0
+
+    def block(slot: int) -> dict | None:
+        """Fetch a block, backing off across endpoints on rate limits."""
+        for attempt in range(8):
+            for url in rpc.read_urls:
+                try:
+                    got = rpc.block_at(url, slot)
+                except requests.exceptions.RequestException:
+                    continue
+                if got:
+                    return got
+            time.sleep(1.5 * (attempt + 1))
+        return None
 
     for m in run.get("measurements", []):
         wanted = {p["signature"]: p for p in m["probes"] if p.get("signature")}
         if not wanted:
             continue
         for slot_key, recorded in m.get("blocks", {}).items():
-            block = rpc.block(int(slot_key))
-            if not block:
-                print(f"slot {slot_key}: block no longer retrievable")
+            blk = block(int(slot_key))
+            if not blk:
+                # Only a mismatch if the run claims our transactions are in it.
+                print(f"slot {slot_key}: block not retrievable from this endpoint")
                 problems += 1
                 continue
-            leader = _leader_from_rewards(block)
-            txs = block.get("transactions") or []
-            print(f"\nslot {slot_key}  leader={leader}  txs={len(txs)}  blockhash={block.get('blockhash')}")
+            leader = _leader_from_rewards(blk)
+            txs = blk.get("transactions") or []
+            print(f"\nslot {slot_key}  leader={leader}  txs={len(txs)}  blockhash={blk.get('blockhash')}")
             if leader != recorded.get("leader_per_rewards"):
                 print(f"  !! recorded leader {recorded.get('leader_per_rewards')} != chain {leader}")
                 problems += 1

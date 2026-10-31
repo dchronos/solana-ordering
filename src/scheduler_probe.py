@@ -59,6 +59,9 @@ from solders.transaction import VersionedTransaction
 
 LAMPORTS_PER_SOL = 1_000_000_000
 BASE_FEE_LAMPORTS = 5_000  # one signature, one fee payer
+# A fee payer below this balance cannot pay at all: the runtime rejects it with
+# InsufficientFundsForRent, and with skipPreflight the send still looks accepted.
+RENT_EXEMPT_MIN_LAMPORTS = 890_880
 SYSTEM_PROGRAM = Pubkey.from_string("11111111111111111111111111111111")
 # A self transfer: 80 CU flat (450 measured including the compute-budget
 # instructions), always succeeds, and moves money to ourselves so the only cost is
@@ -96,20 +99,45 @@ class Rpc:
     def __init__(self, url: str, timeout: float = 30.0) -> None:
         self.url = url
         self.timeout = timeout
+        self.read_urls: list[str] = [url]
         self.session = requests.Session()
         self.session.headers.update({"content-type": "application/json", "user-agent": "scheduler-probe/1"})
         self._id = 0
         self.send_urls: list[str] = [url]
 
     def call(self, method: str, params: Any) -> Any:
+        return self.call_at(self.url, method, params)
+
+    def call_at(self, url: str, method: str, params: Any) -> Any:
         self._id += 1
         payload = {"jsonrpc": "2.0", "id": self._id, "method": method, "params": params}
-        resp = self.session.post(self.url, json=payload, timeout=self.timeout)
+        resp = self.session.post(url, json=payload, timeout=self.timeout)
         resp.raise_for_status()
         body = resp.json()
         if "error" in body:
             raise RpcError(method, body["error"])
         return body["result"]
+
+    def block_at(self, url: str, slot: int) -> dict | None:
+        try:
+            return self.call_at(
+                url,
+                "getBlock",
+                [
+                    slot,
+                    {
+                        "encoding": "json",
+                        "transactionDetails": "full",
+                        "rewards": True,
+                        # Blocks contain v1 transactions; asking for 0 makes the
+                        # whole getBlock call fail, which silently yields no data.
+                        "maxSupportedTransactionVersion": 1,
+                        "commitment": "confirmed",
+                    },
+                ],
+            )
+        except RpcError:
+            return None
 
     def epoch_info(self) -> dict:
         return self.call("getEpochInfo", [])
@@ -153,24 +181,7 @@ class Rpc:
 
     def block(self, slot: int) -> dict | None:
         """Full block: we need per-transaction fee and compute, plus the leader."""
-        try:
-            return self.call(
-                "getBlock",
-                [
-                    slot,
-                    {
-                        "encoding": "json",
-                        "transactionDetails": "full",
-                        "rewards": True,
-                        # Blocks contain v1 transactions; asking for 0 makes the
-                        # whole getBlock call fail, which silently yields no data.
-                        "maxSupportedTransactionVersion": 1,
-                        "commitment": "confirmed",
-                    },
-                ],
-            )
-        except (RpcError, requests.HTTPError):
-            return None
+        return self.block_at(self.url, slot)
 
     def tx_exists(self, signature: str) -> bool:
         try:
@@ -405,6 +416,13 @@ def wait_until_slot(rpc: Rpc, target: int, lead_slots: int) -> None:
         time.sleep(min(2.0, max(0.2, (remaining - lead_slots) * 0.4)))
 
 
+def _quiet_send(rpc: Rpc, url: str, tx: VersionedTransaction) -> None:
+    try:
+        rpc.send_raw_to(url, tx)
+    except (RpcError, requests.HTTPError, requests.exceptions.RequestException):
+        pass
+
+
 def send_round(
     rpc: Rpc,
     payer: Keypair,
@@ -461,19 +479,22 @@ def send_round(
             log(f"    send rejected (nonce {probe.nonce}): {str(exc)[:60]}")
             return
         # An accepted send is not the same as a forwarded one. Fan the identical
-        # bytes out to the backups immediately; the transaction is idempotent and
-        # the leader discards duplicates, so this only removes the drop.
+        # bytes out to the backups too; the transaction is idempotent and the
+        # leader discards duplicates, so this only removes the drop. This runs in
+        # its own pool because waiting on it inside a worker delays the *next*
+        # primary send, which is what spreads the batch across blocks.
         for url in backups:
-            try:
-                rpc.send_raw_to(url, tx)
-            except (RpcError, requests.HTTPError):
-                pass
+            fanout.submit(_quiet_send, rpc, url, tx)
 
-    # The public RPC rejects a burst of 12 parallel sends with HTTP 429, and a
-    # rejected send is a lost measurement. Four workers with a retry fits inside
-    # one slot (~400 ms) while staying under the limiter.
-    with ThreadPoolExecutor(max_workers=args.send_workers) as pool:
+    # Every probe must leave within the same slot. Sends that are serialised by
+    # the worker pool arrive over several hundred milliseconds and get split
+    # across blocks: with 3 workers a 10-probe batch landed in 4-6 different
+    # blocks, leaving 1-3 probes per block, which measures nothing. So all
+    # primaries go out at once; the pool is only there to bound thread count.
+    fanout = ThreadPoolExecutor(max_workers=8)
+    with ThreadPoolExecutor(max_workers=min(args.send_workers, len(prepared))) as pool:
         list(pool.map(fire, prepared))
+    fanout.shutdown(wait=True)
     m.probes.extend(probe for _, probe in prepared)
     return m
 
@@ -507,6 +528,9 @@ def harvest(rpc: Rpc, m: Measurement) -> None:
             if not probe:
                 continue
             probe.landed = True
+            # The block that actually contains the signature is the authority on
+            # where it landed, so it overwrites the status-reported slot.
+            probe.slot = int(slot)
             probe.tx_index = idx
             meta = tx.get("meta") or {}
             probe.fee_lamports = meta.get("fee")
@@ -528,22 +552,34 @@ def harvest(rpc: Rpc, m: Measurement) -> None:
 
 
 def _fetch_block(rpc: Rpc, slot: int) -> dict | None:
-    """Blocks arrive up to a few seconds after the slot; poll briefly."""
-    for _ in range(5):
-        block = rpc.block(slot)
-        if block:
-            return block
+    """Blocks arrive up to a few seconds after the slot; poll across endpoints."""
+    for attempt in range(6):
+        for url in rpc.read_urls or [rpc.url]:
+            try:
+                block = rpc.block_at(url, slot)
+            except (requests.HTTPError, requests.exceptions.RequestException):
+                continue
+            if block:
+                return block
         time.sleep(2.0)
     return None
 
 
 def _landing_slot(rpc: Rpc, signature: str) -> int | None:
-    try:
-        res = rpc.call("getSignatureStatuses", [[signature], {"searchTransactionHistory": True}])
-        status = (res.get("value") or [None])[0]
-        return status.get("slot") if status else None
-    except (RpcError, requests.HTTPError):
-        return None
+    """Where the chain says this signature landed, or None if it never did.
+
+    Reads are retried across endpoints: after SOL has been spent the harvest must
+    not be the thing that loses the data. A single unreachable public RPC once
+    aborted a full run at this line.
+    """
+    for url in rpc.read_urls or [rpc.url]:
+        try:
+            res = rpc.call_at(url, "getSignatureStatuses", [[signature], {"searchTransactionHistory": True}])
+            status = (res.get("value") or [None])[0]
+            return status.get("slot") if status else None
+        except (RpcError, requests.HTTPError, requests.exceptions.RequestException):
+            continue
+    return None
 
 
 def _leader_from_rewards(block: dict) -> str | None:
@@ -556,6 +592,8 @@ def _leader_from_rewards(block: dict) -> str | None:
 
 def run(args: argparse.Namespace) -> dict:
     rpc = Rpc(args.rpc)
+    # reads (harvest) may use any endpoint; writes go to --rpc and its backups
+    rpc.read_urls = list(dict.fromkeys([args.rpc, *args.backup_rpc]))
     validators = collect_validators(rpc)
     owners = slot_owners(rpc)
     epoch = rpc.epoch_info()
@@ -589,8 +627,16 @@ def run(args: argparse.Namespace) -> dict:
     payer = load_keypair(args.keypair)
     guard = SpendGuard(args.max_lamports)
     start = rpc.balance(payer.pubkey())
-    if start < args.max_lamports + args.reserve_lamports:
-        raise SystemExit(f"payer {payer.pubkey()} holds {start} lamports; need cap+reserve")
+    # Two distinct floors, both fatal: cap+reserve so the run cannot overdraw, and
+    # the rent-exempt minimum because an account below it cannot pay a fee at all.
+    need = max(args.max_lamports + args.reserve_lamports, RENT_EXEMPT_MIN_LAMPORTS + args.reserve_lamports)
+    if start < need:
+        raise SystemExit(
+            f"payer {payer.pubkey()} holds {start} lamports; need {need} "
+            f"(cap {args.max_lamports} + reserve {args.reserve_lamports}, and the "
+            f"{RENT_EXEMPT_MIN_LAMPORTS}-lamport rent-exempt minimum). "
+            f"Top up {need - start} lamports."
+        )
     plan["payer"] = str(payer.pubkey())
     plan["start_balance_lamports"] = start
 
@@ -673,6 +719,27 @@ def analyse(report: dict) -> dict:
     # also index every validator we know about from the run plan
     for w in report.get("windows", []):
         validators.setdefault(w["identity"], w)
+    # A block can be produced by a validator we never aimed at, whose client we
+    # then do not know from the run itself. That would silently turn a real
+    # measurement into "unknown", so resolve it against the live cluster when the
+    # report carries no offline snapshot.
+    known = {k: v for k, v in report.get("cluster", {}).items()}
+    for block in [b for m in report.get("measurements", []) for b in (m.get("blocks") or {}).values()]:
+        leader = block.get("leader_per_rewards")
+        if not leader or leader in validators:
+            continue
+        # A block's fee recipient is not always the validator identity: a vote
+        # account can route block revenue to a separate collector (100% commission
+        # in the case observed here), and the collector is neither in the leader
+        # schedule nor in the cluster snapshot. The vote account that points at it
+        # still names the node, so resolve through that rather than calling the
+        # block "unknown" and dropping a real measurement.
+        node = report.get("revenue_to_node", {}).get(leader)
+        if node and node in known:
+            validators[leader] = known[node]
+            continue
+        if leader in known:
+            validators[leader] = known[leader]
 
     blocks: dict[str, dict] = {}
     for m in report.get("measurements", []):
@@ -766,119 +833,6 @@ def analyse(report: dict) -> dict:
     return {"rows": rows, "summary": summary}
 
 
-def spearman(a: Iterable[float], b: Iterable[float]) -> float:
-    a, b = list(a), list(b)
-    if len(a) != len(b) or len(a) < 3:
-        return 0.0
-    ra, rb = _ranks(a), _ranks(b)
-    ma, mb = statistics.fmean(ra), statistics.fmean(rb)
-    num = sum((x - ma) * (y - mb) for x, y in zip(ra, rb))
-    den = (sum((x - ma) ** 2 for x in ra) * sum((y - mb) ** 2 for y in rb)) ** 0.5
-    return num / den if den else 0.0
-
-
-def _ranks(xs: list[float]) -> list[float]:
-    order = sorted(range(len(xs)), key=lambda i: xs[i])
-    ranks = [0.0] * len(xs)
-    i = 0
-    while i < len(order):
-        j = i
-        while j + 1 < len(order) and xs[order[j + 1]] == xs[order[i]]:
-            j += 1
-        avg = (i + j) / 2 + 1
-        for k in range(i, j + 1):
-            ranks[order[k]] = avg
-        i = j + 1
-    return ranks
-
-
-def analyse(report: dict) -> dict:
-    """Score candidate ordering rules per measured slot, then aggregate by client."""
-    rows: list[dict] = []
-    for m in report.get("measurements", []):
-        # A block produced by a different validator answers a different question.
-        # Those measurements stay in the raw data but never enter the per-client
-        # statistics.
-        if m.get("on_target") is False:
-            rows.append(
-                {
-                    "slot": m["slot"],
-                    "client_family": m["validator"]["client_family"],
-                    "landed": sum(1 for p in m["probes"] if p["landed"]),
-                    "verdict": "off-target block, excluded",
-                }
-            )
-            continue
-        landed = [p for p in m["probes"] if p["landed"] and p["tx_index"] is not None]
-        if len(landed) < 3:
-            rows.append(
-                {
-                    "slot": m["slot"],
-                    "client_family": m["validator"]["client_family"],
-                    "landed": len(landed),
-                    "verdict": "insufficient data",
-                }
-            )
-            continue
-        observed = [p for p in sorted(landed, key=lambda p: p["tx_index"])]
-        pos = [p["tx_index"] for p in observed]
-
-        def corr(keyfn, reverse=False) -> float:
-            """Correlate the rule's predicted rank with the real block position.
-
-            The predicted rank of a probe is its index once the batch is sorted by
-            the rule; the observed value is its position in the block. Correlating
-            anything else (e.g. the probe's index in the input list) would measure
-            the input ordering against itself and produce a meaningless 1.0.
-            """
-            ordered = sorted(landed, key=keyfn, reverse=reverse)
-            predicted = {id(p): i for i, p in enumerate(ordered)}
-            return spearman([predicted[id(p)] for p in landed], pos)
-
-        scores = {
-            # higher fee first
-            "fee_desc": corr(lambda p: p["fee_lamports"] if p["fee_lamports"] is not None else -1, reverse=True),
-            # our own send order
-            "send_seq": corr(lambda p: p["send_seq"]),
-            # cheap proxy for "arrival order at the leader"
-            "sent_at": corr(lambda p: p["sent_at"]),
-            "nonce": corr(lambda p: p["nonce"]),
-        }
-        best = max(scores, key=lambda k: scores[k])
-        rows.append(
-            {
-                "slot": m["slot"],
-                "client_family": m["validator"]["client_family"],
-                "version": m["validator"]["version"],
-                "vote": m["validator"]["vote"],
-                "landed": len(landed),
-                "block_tx_count": sum(b["tx_count"] for b in (m.get("blocks") or {}).values()),
-                "leader_matches_schedule": m.get("leader_matches_schedule"),
-                "correlation": {k: round(v, 3) for k, v in scores.items()},
-                "best_rule": best,
-                "best_correlation": round(scores[best], 3),
-            }
-        )
-
-    by_family: dict[str, list[dict]] = {}
-    for r in rows:
-        if "best_rule" in r:
-            by_family.setdefault(r["client_family"], []).append(r)
-
-    summary = {}
-    for fam, rs in by_family.items():
-        rules: dict[str, int] = {}
-        for r in rs:
-            rules[r["best_rule"]] = rules.get(r["best_rule"], 0) + 1
-        summary[fam] = {
-            "slots": len(rs),
-            "landed_total": sum(r["landed"] for r in rs),
-            "rule_votes": rules,
-            "mean_best_corr": round(statistics.fmean(r["best_correlation"] for r in rs), 3),
-        }
-    return {"rows": rows, "summary": summary}
-
-
 # ---------------------------------------------------------------------------- cli
 
 
@@ -891,7 +845,17 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--per-slot", type=int, default=8, help="competing transactions per leader slot")
     p.add_argument("--cu-limit", type=int, default=1_200)
     p.add_argument("--fee-base", type=int, default=0, help="lowest priority fee, micro-lamports per CU")
-    p.add_argument("--fee-step", type=int, default=2_500, help="step between consecutive priority fees")
+    p.add_argument(
+        "--fee-step",
+        type=int,
+        default=1_500_000,
+        help=(
+            "step between consecutive priority fees, micro-lamports per CU. The "
+            "priority fee in lamports is cu_limit*micro/1e6, so a step of 2_500 "
+            "buys 3 lamports at a 1_200 CU limit: a spread too small to test the "
+            "fee hypothesis at all. The default buys 1_800 lamports per step."
+        ),
+    )
     p.add_argument(
         "--lead-slots",
         type=int,
@@ -907,8 +871,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         help="extra endpoints that receive the same signed bytes, to defeat silent drops",
     )
     p.add_argument("--settle", type=float, default=20.0, help="seconds before reading blocks back")
-    p.add_argument("--max-lamports", type=int, default=700_000, help="hard cap, enforced before each send")
-    p.add_argument("--reserve-lamports", type=int, default=50_000)
+    # The default plan (6 families x 2 slots x 8 probes with the default fee
+    # ladder) estimates 0.00093 SOL; the cap has to exceed that or the default
+    # command refuses its own default plan.
+    p.add_argument("--max-lamports", type=int, default=1_500_000, help="hard cap, enforced before each send")
+    p.add_argument("--reserve-lamports", type=int, default=200_000)
     p.add_argument("--out", default="data/run.json")
     mode = p.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", default=True, help="plan only (default)")

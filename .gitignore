@@ -6,3 +6,5 @@ __pycache__/
 *.pyc
 keypair*.json
 .env
+data/run_dry-run.json
+data/run_final.json

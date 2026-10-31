@@ -8,6 +8,9 @@
 services:
   probe:
     build: .
+    # the container writes data/ as root, which leaves root-owned files in the
+    # repository; run as the caller instead
+    user: "${UID:-1000}:${GID:-1000}"
     environment:
       SOLANA_RPC: ${SOLANA_RPC:-https://api.mainnet-beta.solana.com}
       SOLANA_KEYPAIR_PATH: /tmp/key/payer.json
@@ -15,19 +18,23 @@ services:
     volumes:
       - ./data:/app/data
     tmpfs:
-      - /tmp/key:mode=0700,size=1m
+      # 1777, not 0700: the container runs as the caller's uid, which cannot
+      # unlink the key from a root-owned directory at the end of the run
+      - /tmp/key:mode=1777,size=1m
     # The cap guards the wallet even if the configuration is wrong: the tool
     # refuses to sign past MAX_LAMPORTS.
+    # entrypoint override: the image entrypoint is the probe itself, so a shell
+    # command would otherwise be passed to it as arguments.
+    entrypoint: ["sh", "-c"]
     command:
-      - "sh"
-      - "-c"
       - |
         set -e
-        MODE="${MODE:-dry-run}"
         if [ -n "$${SOLANA_SECRET_KEY}" ]; then
           sh /app/scripts/make_key.sh /tmp/key/payer.json
           FLAG=--live
+          MODE=live
         else
+          # no key means no signature: the run can only print its plan
           FLAG=--dry-run
           MODE=dry-run
         fi
@@ -36,7 +43,7 @@ services:
           --keypair /tmp/key/payer.json \
           --per-family "${PER_FAMILY:-1}" \
           --per-slot "${PER_SLOT:-8}" \
-          --max-lamports "${MAX_LAMPORTS:-700000}" \
-          --reserve-lamports "${RESERVE_LAMPORTS:-50000}" \
+          --max-lamports "${MAX_LAMPORTS:-1500000}" \
+          --reserve-lamports "${RESERVE_LAMPORTS:-200000}" \
           --out "data/run_$${MODE}.json"
         rm -f /tmp/key/payer.json
