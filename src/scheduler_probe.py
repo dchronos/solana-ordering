@@ -48,21 +48,41 @@ from dataclasses import dataclass, field
 from typing import Any, Iterable
 
 import requests
-from solders.compute_budget import set_compute_unit_limit, set_compute_unit_price
-from solders.hash import Hash
-from solders.instruction import AccountMeta, Instruction
-from solders.keypair import Keypair
-from solders.message import MessageV0
-from solders.pubkey import Pubkey
-from solders.signature import Signature
-from solders.transaction import VersionedTransaction
+
+# `solders` is only needed to *sign*: loading a keypair, building a transaction
+# and sending it. Verification reads blocks and needs none of that, and a judge
+# who only wants to re-check our claims should not have to install a signing
+# library to do it. Import lazily so `scripts/verify_blocks.py` runs on requests
+# alone; the names below stay unbound until a signing path touches them.
+try:
+    from solders.compute_budget import set_compute_unit_limit, set_compute_unit_price
+    from solders.hash import Hash
+    from solders.instruction import AccountMeta, Instruction
+    from solders.keypair import Keypair
+    from solders.message import MessageV0
+    from solders.pubkey import Pubkey
+    from solders.signature import Signature
+    from solders.transaction import VersionedTransaction
+except ImportError:  # verification-only environment
+    set_compute_unit_limit = set_compute_unit_price = None
+    Hash = AccountMeta = Instruction = Keypair = None
+    MessageV0 = Pubkey = Signature = VersionedTransaction = None
+
+
+def _require_solders() -> None:
+    """Fail with an actionable message instead of a NameError from a None global."""
+    if Keypair is None:
+        raise SystemExit(
+            "signing needs the `solders` package (pip install -r requirements.txt); "
+            "verification with scripts/verify_blocks.py does not"
+        )
 
 LAMPORTS_PER_SOL = 1_000_000_000
 BASE_FEE_LAMPORTS = 5_000  # one signature, one fee payer
 # A fee payer below this balance cannot pay at all: the runtime rejects it with
 # InsufficientFundsForRent, and with skipPreflight the send still looks accepted.
 RENT_EXEMPT_MIN_LAMPORTS = 890_880
-SYSTEM_PROGRAM = Pubkey.from_string("11111111111111111111111111111111")
+SYSTEM_PROGRAM = "11111111111111111111111111111111"
 # A self transfer: 80 CU flat (450 measured including the compute-budget
 # instructions), always succeeds, and moves money to ourselves so the only cost is
 # the fee. Memo costs more than 1200 CU under the current cost model, so it is a
@@ -155,9 +175,11 @@ class Rpc:
         return self.call("getBalance", [str(pubkey), {"commitment": "confirmed"}])["value"]
 
     def latest_blockhash(self) -> Hash:
+        _require_solders()
         return Hash.from_string(self.call("getLatestBlockhash", [{"commitment": "processed"}])["value"]["blockhash"])
 
     def send_raw(self, tx: VersionedTransaction) -> Signature:
+        _require_solders()
         raw = base64.b64encode(bytes(tx)).decode()
         params = [
             raw,
@@ -166,6 +188,7 @@ class Rpc:
         return Signature.from_string(self.call("sendTransaction", params))
 
     def send_raw_to(self, url: str, tx: VersionedTransaction) -> Signature:
+        _require_solders()
         raw = base64.b64encode(bytes(tx)).decode()
         params = [
             raw,
@@ -296,6 +319,7 @@ def choose_windows(
 
 
 def load_keypair(path: str | None) -> Keypair:
+    _require_solders()
     path = path or os.environ.get("SOLANA_KEYPAIR_PATH")
     if not path:
         raise SystemExit("no keypair: pass --keypair or set SOLANA_KEYPAIR_PATH")
@@ -319,12 +343,13 @@ def build_probe_tx(payer: Keypair, blockhash: Hash, nonce: int, cu_limit: int, m
     the fee. The nonce in the amount guarantees a unique signature even when two
     probes share blockhash, fee and compute limit, which would otherwise dedupe.
     """
+    _require_solders()
     me = payer.pubkey()
     data = SYSTEM_TRANSFER_TAG + nonce.to_bytes(8, "little")
     ix = [
         set_compute_unit_limit(cu_limit),
         set_compute_unit_price(micro_lamports),
-        Instruction(SYSTEM_PROGRAM, data, [AccountMeta(me, True, True), AccountMeta(me, False, True)]),
+        Instruction(Pubkey.from_string(SYSTEM_PROGRAM), data, [AccountMeta(me, True, True), AccountMeta(me, False, True)]),
     ]
     msg = MessageV0.try_compile(me, ix, [], blockhash)
     return VersionedTransaction(msg, [payer])

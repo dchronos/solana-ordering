@@ -173,9 +173,16 @@ Everything below is re-derivable from the signatures in `data/` with
 our transactions' positions again, independently of the analysis block:
 
 ```bash
+pip install -r requirements-verify.txt             # requests only: no signing library
 python scripts/verify_blocks.py data/run_v3.json   # -> "verification: consistent"
 python scripts/summarise.py                        # the tables below, from raw data
 ```
+
+Verification deliberately does not need `solders`. Reading a block and comparing
+positions back to our signatures uses only `requests`; signing is what needs the
+rest of the stack, and the import is lazy so that stays true. Cloning the repo and
+running the verifier against mainnet is therefore a one-dependency operation, and
+it re-derives every position from the chain rather than trusting the file.
 
 **40 blocks, 293 probes, 14 validator identities (22 revenue leaders), 6 client builds: ordering is arrival, not price.**
 
