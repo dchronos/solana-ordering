@@ -134,5 +134,7 @@ SOLANA_SECRET_KEY=<base58> docker compose up       # live, capped, writes data/
 
 Raw data for every claim is in `data/`: per-probe nonce, signature, fee, compute,
 send timestamp, landing slot and block index, plus per-block signature lists.
+`data/MANIFEST.md` says which files are canonical and which are superseded (with
+the reason), so nothing stale can be mistaken for evidence.
 Total spent across all runs in this repository: **0.00235 SOL**, against the
 bounty's 0.05 SOL limit.

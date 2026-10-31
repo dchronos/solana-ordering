@@ -156,6 +156,7 @@ our transactions' positions again, independently of the analysis block:
 
 ```bash
 python scripts/verify_blocks.py data/run_v3.json   # -> "verification: consistent"
+python scripts/summarise.py                        # the tables below, from raw data
 ```
 
 **40 blocks, 293 probes, 22 validators, 6 client builds: ordering is arrival, not price.**
